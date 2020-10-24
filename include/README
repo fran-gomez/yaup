@@ -1,0 +1,32 @@
+En este directorio del sistema nos encontramos con los headers de la
+biblioteca estandar de C, asi como los necesarios por los demas modulos
+del SO (include/yaup). El codigo de las funciones se encuentra en la 
+carpeta yaup/lib, aqui solo estan las declaraciones, asi como los tipos
+de dato y macros utilizados por la biblioteca.
+
+ctype.h Contiene las macros para clasificar caracteres segun su tipo, ya
+sean letras, digitos, caracteres de control, etc.
+
+dirent.h Contiene todo lo necesario para manejar directorios 
+
+errno.h Contiene los codigos de error del sistema, asi como la variable
+global errno.
+
+math.h Contiene algunas funciones matematicas basicas,
+
+stdio.h Contiene las funciones necesarias para el manejo de archivos y
+flujos de texto.
+
+stdlib.h Contiene un rejunte de funciones estandar de C.
+
+string.h Contiene las funciones necesarias para manipular cadenas de
+caracteres.
+
+unistd.h Contiene algunas llamadas al sistema que no poseen su propia
+funcion en el estandar de C.
+
+sys/types.h Contiene la declaracione de varios tipos de dato que facilitan
+el entendimiento del codigo.
+
+sys/stat.h Contiene la estructura que mantiene la informacion de un archivo
+asi como las funciones para operar con ellos.

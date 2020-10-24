@@ -1,0 +1,67 @@
+CMD es el modulo del sistema que contiene los programas para la linea de
+comandos. Esta separado en varios submodulos que detallaremos a continuacion
+
+    chgrp: Cambia el grupo al que pertenece un archivo
+    chmod: Cambia el modo RWX de un archivo para su dueño, los miembros de su
+           grupo y los demas usuarios
+    chown: Cambia el identificador del dueño del archivo
+    cp: Copia un archivo a otro, o multiples archivos a un directorio
+    crypt: Encripta un archivo utilizando una clave privada
+    du: Muestra el espacio en disco que ocupa un archivo
+    file: Muestra la informacion referente a un archivo
+    find: Busca un archivo determinado partiendo desde un directorio raiz
+    install: Crea un archivo o directorio nuevo
+    ln: Enlaza dos archivos, o crea un enlace simbolico
+    ls: Muestra el contenido de un directorio
+    mv: Mueve un archivo o directorio a otro
+    rm: Elimina un archivo o directorio
+    sum: Calcula la suma de redundancias de un archivo o directorio
+    sync: Le pide al SO que vuelque todos los archivos de memoria al disco
+
+    cat: Concatena y muestra archivos por pantalla
+    cmp: Compara dos archivos byte a byte y muestra la primera diferencia
+    cut: Imprime un rango determinado de bytes para cada linea de un
+         archivo
+    diff: Computa la diferencia entre cada linea de dos archivos. En
+          conjunto con la Herramienta 'patch', sirve para crear saltos
+          de versiones entre archivos de texto
+    grep: Busca una expresion regular dentro de un archivo
+    head: Imprime las primeras N lineas de un archivo
+    lpr: Imprime un archivo por la impresora conectada
+    nl: Numera las lineas de un archivo y lo imprime
+    od: Calcula la representacion octal de un archivo y lo muestra por
+        pantalla
+    tail: Imprime las ultimas N lineas de un archivo
+    tr: Traduce un conjunto de caracteres en otro
+    wc: Cuenta la cantidad de bytes, palabras y lineas de un archivo
+
+
+TODO list:
+
+file-system:
+    chgrp, chmod, chown: Implementacion del parametro recursivo -> HECHO
+
+    cksum: Corregir segfault
+
+    cp: Implementar la copia directorio a directorio -> CORREGIR
+
+    du: Calculo del tamaño de un directorio no vacio -> HECHO
+
+    file: Formateo del modo, uid y gid
+
+    ls: Implementar el orden alfabetico de las entradas de directorio
+
+    mount: La llamada al sistema mount(src, dst, rwflag) todavia no esta implementada
+
+    Find: La busqueda recursiva en directorios todavia no esta implementada -> CORREGIR PATHS
+
+    mv: Movimiento de directorios
+
+    rm: Eliminacion recursiva de un directorio -> HECHO
+
+    umount: Eliminar la entrada del mtab
+
+    dd, df, fsck, mkfs: Todo
+
+Proc-Utils:
+    free: Imprimir los datos de la swap
