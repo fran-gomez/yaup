@@ -1,6 +1,5 @@
-YAUP (Yet Another Unix Port) es un sistema operativo que intenta emular
-a la v7 de unix, teniendo como objetivo principal respetar la filosofia
-unix
+xv8 (Unix v8) es una reimaginacion de lo que pudo haber sido la v8
+de unix, teniendo como objetivo principal respetar la filosofia unix
     (1) Escribir programas que hagan una cosa, y la hagan bien
     (2) Escribir los programas para que trabajen juntos
     (3) Escribir programas que trabajen con streams de texto, puesto que esta,
@@ -12,23 +11,8 @@ de comandos, asi como un shell basico para poder invocarlas.
 Por otro lado, se provee una implementacion basica de la libreria estandar
 de C y las llamadas al sistema disponibles en unix-v7.
 
-En el directorio "fs" encontramos al sistema de archivos y sus
- espectivas llamadas al sistema.
-
-En el directorio "proc" tenemos al planificador de tareas, asi como las
-llamadas correspondientes a la creacion de procesos (Threads no disponibles
-por el momento).
-
-En el directorio "mem" se encuentra el administrador de memoria virtual,
-y las llamadas para reservar y liberar memoria a demanda.
-
-Por ultimo, en el directorio "dev" tenemos una serie de dispositivos virtuales
-(Terminal, teclado, RTC, impresora, disco, red) a modo de prueba para los
-modulos del SO.
-
-Toda la informacion previamente presentada, es extendida en el README
-de cada uno de los modulos.
-
+Finalmente, se implementa un kernel basico con planificacion de procesos,
+memoria virtual y sistema de archivos.
 
 Para cualquier sugerencia y/o consulta, no dudes en escribirme via mail a
         fgvolonterio@gmail.com
