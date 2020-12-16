@@ -3,6 +3,7 @@
 
 #include "param.h"
 #include "types.h"
+#include "locks.h"
 
 #include "fs.h"
 #include "mem.h"
@@ -82,28 +83,33 @@ struct proc {
     uid_t p_suid; /* Saved user ID */
     uid_t p_uid;  /* Real user ID */
     
-    gid_t p_egid;
-    gid_t p_sgid;
-    gid_t p_gid;
+    gid_t p_egid; /* Effective group ID */
+    gid_t p_sgid; /* Saved group ID */
+    gid_t p_gid;  /* Real group ID */
 
     // File system related fields
     mode_t p_umask; /* User permission mask */
     struct inode *p_cwd; /* Process current work dir */
     struct inode *p_root; /* Process root dir */
-    struct file  *p_filp[NR_FILE]; /* Open files table */
+    struct file  *p_filp[NR_OFILES]; /* Open files table */
 
     // Execution related fields
     long *p_textp; /* Pointer to text segment */
     long *p_datap; /* Pointer to data segment */
     long *p_heapp; /* Pointer to heap segment */
 
-    struct tss *tss; /* Pointer to process state segment */
+    struct tss tss; /* Pointer to process state segment */
+
+    struct spinlock sl;
 };
 
 /* Scheduler internal tables */
-extern struct proc *proc_table[NR_PROC];
-extern struct proc *current;
-extern time_t startup_time;
+struct {
+	struct proc procs[NR_PROC];
+	struct spinlock sl;
+} proc_table; /* System's proc table */
+
+time_t startup_time;
 
 /* Scheduler operations */
 void init_sched(void);
@@ -112,6 +118,8 @@ void load_init(void);
 
 void schedule(void);
 void switch_task(pid_t n);
+
+struct proc *current_task();
 
 void panic(const char *str);
 

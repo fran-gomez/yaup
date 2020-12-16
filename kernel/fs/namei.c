@@ -1,4 +1,5 @@
 #include "../include/fs.h"
+#include "../include/sched.h"
 #include "../include/locks.h"
 #include "../include/string.h"
 
@@ -40,7 +41,7 @@ static struct inode *dir_lookup(struct inode *ip, char *entry, off_t esize) {
 	// Look for entry inside ip's entry list
 	for (i = 0; i < NDIRECT; i++) {
 		b = bread(ip->i_dev, ip->i_addr[i]);
-		for (j = 0; j < BLK_SZ; j += DPB) {
+		for (j = 0; j < BLK_SZ; j += DENT_PER_BLK) {
 			memcpy(&d, &(b->b_data[j]), sizeof(struct dirent));
 			if (strncmp(d.name, entry,esize) == 0)
 				return iget(ip->i_dev, d.d_inode);

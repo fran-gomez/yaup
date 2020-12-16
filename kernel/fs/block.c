@@ -55,25 +55,60 @@ int bwrite(struct buffer *b) {
 	return 0;
 }
 
-/*int bzeroo(dev_t dev, blk_t blk) {
+// Obtiene el lock del buffer b
+int block(struct buffer *b) {
 
-	struct buffer *b;
-
-	b = bget(dev, blk);
-	memset(b->b_data, 0, BLK_SZ);
-	b->b_dirty = 1;
-	bwrite(b);
-
+	if (holdingsleep(buffer.sl))
+		acquire(b->sl);
+	
 	return 0;
-}*/
+}
 
+// Libera el buffer b para posterior uso
 int brelease(struct buffer *b) {
 	 
 	if (b->b_count <= 0)
 		panic("brelease: unused buffer");
-	b->b_count--;
+	
+	if (holdingsleep(b->sl)) {
+		b->b_count--;
+		release(b->sl);
+	}
 
 	return 0;
+}
+
+struct buffer *balloc(dev_t dev) {
+
+	int i;
+	off_t off;
+	blk_t blk;
+	struct buffer *b;
+	struct superblock *sb;
+
+	sb = &(mtable.superblock[dev]);
+	if (!sb)
+		panic("balloc: bad dev num");
+	
+	off = 0;
+	while (off < sb->s_free_blk_len) {
+		i = 0;
+		b = bread(dev, sb->s_free_blk+off);
+		if (!b)
+			panic("balloc: cannot get block");
+		
+		while (i++ < BLK_SZ) {
+			blk = get_free_pos(b->b_data[i]);
+			if (blk > 0) {
+				b = bget(dev, blk);
+				if (!b)
+					panic("balloc: no free space on buffer");
+				break;
+			}
+		}
+	}
+
+	return b;
 }
 
 // TODO: This is not even close to its final version
@@ -89,19 +124,31 @@ int bfree(dev_t dev, blk_t blk) {
 	return 0;
 }
 
+/*int bzeroo(dev_t dev, blk_t blk) {
+
+	struct buffer *b;
+
+	b = bget(dev, blk);
+	memset(b->b_data, 0, BLK_SZ);
+	b->b_dirty = 1;
+	bwrite(b);
+
+	return 0;
+}*/
+
 static struct buffer *bget(dev_t dev, blk_t blk) {
 
 	struct buffer *b;
 
 	acquire(buffer.sl);
 
-	for (b = buffer.head; b; b = b->b_next)
+	for (b = &(buffer.blocks[0]); b != &(buffer.blocks[NR_BUF]); b++)
 		if (b->b_dev == dev && b->b_blk == blk) {
 			release(buffer.sl);
 			return b;
 		}
 	
-	for (b = buffer.head; b; b = b->b_next)
+	for (b = $(buffer.blocks[0]); b != &(buffer.blocks[NR_BUF]); b++)
 		if (b->b_count == 0) {
 			b->b_blk = blk;
 			b->b_dev = dev;

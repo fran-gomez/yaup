@@ -12,7 +12,7 @@ Por otro lado, se provee una implementacion basica de la libreria estandar
 de C y las llamadas al sistema disponibles en unix-v7.
 
 Finalmente, se implementa un kernel basico con planificacion de procesos,
-memoria virtual y sistema de archivos.
+memoria virtual, sistema de archivos y conexion de red.
 
 Para cualquier sugerencia y/o consulta, no dudes en escribirme via mail a
         fgvolonterio@gmail.com

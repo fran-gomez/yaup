@@ -10,7 +10,7 @@ off_t get_free_pos(bitmap *b) {
 
     // Find an entry with at least one free bit(1)
     while (b)
-        if (!*b) {
+        if (*b == 0) {
             b++;
             i += sizeof(*b);
         }

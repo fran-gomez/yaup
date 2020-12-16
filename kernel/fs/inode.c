@@ -5,8 +5,8 @@
 #include <errno.h>
 
 #define ITABLE_BASE(dev) mtable.superblock[dev].s_ino_table
-#define BLK_ADDR(dev, ino) ITABLE_BASE(dev) + (ino / IPB)
-#define BLK_OFF(ino) ino % IPB
+#define BLK_ADDR(dev, ino) ITABLE_BASE(dev) + (ino / INO_PER_BLK)
+#define BLK_OFF(ino) ino % INO_PER_BLK
 
 void inodes_init(void) {
 
@@ -19,7 +19,7 @@ struct inode *iget(dev_t dev, ino_t ino) {
 
 	acquire(icache.sl);
 
-	for (i = &(icache.table[0]); i != &(icache.table[NR_INODE]); i++)
+	for (i = &(icache.inodes[0]); i != &(icache.inodes[NR_INODE]); i++)
 		if (i->i_dev == dev && i->i_num == ino) {
 			release(icache.sl);
 			return i;
@@ -61,10 +61,52 @@ int iput(struct inode *i) {
 	return 0;
 }
 
-// As I will be running this on a SSD, there will be no
-// periodic updates on disk
-int iupdate(struct inode *i) {
-	return EINPROGRESS;
+int ilock(struct inode *i) {
+
+	if (holdingsleep(icache.sl))
+		acquire(i->sl);
+	
+	return 0;
+}
+
+int irelease(struct inode *i) {
+
+	if (i->i_count < 0)
+		panic("irelease: releasing an unussed inode");
+
+	if (holdingsleep(i->sl)) {
+		i->i_count--;
+		release(i->sl);
+	}
+
+	return 0;
+}
+
+struct inode *ialloc(dev_t dev) {
+
+	int c;
+	ino_t inum;
+	struct buffer *b;
+	struct inode *i;
+	struct superblock *sb;
+
+	sb = &(mtable.superblock[dev]);
+	if (!sb)
+		panic("ialloc: invalid device");
+
+	for (c = 0; c < sb->s_free_ino_len; c++) {
+		b = bread(dev, sb->s_free_ino+c);
+		if (!b)
+			panic("ialloc: cannot get block");
+
+		inum = get_free_pos(b->b_data);
+		if (inum > 0) {
+			i = iget(dev, inum);
+			break;
+		}
+	}
+
+	return i;
 }
 
 int ifree(struct inode *i) {

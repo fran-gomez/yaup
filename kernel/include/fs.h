@@ -5,18 +5,32 @@
 #include "param.h"
 #include "types.h"
 
-/* Inode mode */
+/* Inode type bits */
 #define IFMT  0170000
-#define     IFREG 0100000
-#define     IFDIR 0040000
-#define     IFCHR 0020000
-#define     IFBLK 0060000
+#define IFREG 0100000
+#define IFDIR 0040000
+#define IFCHR 0020000
+#define IFBLK 0060000
+
+/* Inode mode bits */
 #define ISUID 04000
 #define ISGID 02000
 #define ISVTX 01000
-#define IREAD 0400
-#define IWRT  0200
-#define IEXEC 0100
+
+#define IRWXU 0700
+#define IRUSR 0400
+#define IWUSR 0200
+#define IXUSR 0100
+
+#define IRWXG 070
+#define IRGRP 040
+#define IWGRP 020
+#define IXGRP 010
+
+#define IRWXO 07
+#define IROTH 04
+#define IWOTH 02
+#define IXOTH 01
 
 /* Inode flags */
 #define ILCK  01  /* Inode is locked, bad planning here */
@@ -44,8 +58,8 @@
 
 #define MAX_NAME 25
 
-#define ROOT_INODE icache.table[0] /* Yes, root's inode is hardcoded to position 0 */
-#define CWD_INODE NULL
+#define ROOT_INODE icache.inodes[0] /* Yes, root's inode is hardcoded to position 0 */
+#define CWD_INODE current_task()->p_cwd
 
 typedef unsigned short bitmap;
 
@@ -122,8 +136,8 @@ struct buffer {
 	int  b_dirty; /* 0=clean, 1=dirty */
 	u8_t b_count;  /* # of procs using this block */
 
-	struct buffer *b_prev; /* Pointer to previous block */
-	struct buffer *b_next; /* Pointer to next block */
+	//struct buffer *b_prev; /* Pointer to previous block */
+	//struct buffer *b_next; /* Pointer to next block */
 
 	struct spinlock sl;
 };
@@ -211,36 +225,41 @@ struct {
 } mtable; /* Mounted device table */
 
 struct {
-	struct inode table[NR_INODE];
+	struct inode inodes[NR_INODE];
 	struct spinlock sl;
 } icache; /* Inodes cache */
 
 struct {
-	struct buffer *head;
+	struct buffer blocks[NR_BUF];
 	struct spinlock sl;
-} buffer; /* Buffered files table */
+} buffer; /* Buffered blocks table */
 
 struct {
-	struct file files[NR_FILE];
+	struct file files[NR_FILES];
 	struct spinlock sl;
-} ofiles; /* Open files */
+} open_files; /* Open files */
 
 /* Buffer ops */
-struct buffer *bread(dev_t dev, blk_t blk);
-int bwrite(struct buffer *b);
-//int bzeroo(dev_t dev, blk_t blk);
-int brelease(struct buffer *b);
-int bfree(dev_t dev, blk_t blk);
+struct buffer *bread(dev_t, blk_t);
+int bwrite(struct buffer *);
+int block(struct buffer *);
+int brelease(struct buffer *);
+struct buffer *balloc(dev_t);
+int bfree(dev_t, blk_t);
+//int bzeroo();
 
 /* Inode ops */
-struct inode *iget(dev_t dev, ino_t ino);
-int iput(struct inode *i);
-int iupdate(struct inode *i);
-int ifree(struct inode *i);
+struct inode *iget(dev_t, ino_t);
+int iput(struct inode *);
+int ilock(struct inode *);
+int irelease(struct inode *);
+struct inode *ialloc(dev_t);
+int ifree(struct inode *);
 
-struct inode *namei(char *path);
+struct inode *namei(char *);
 
 /* Super block ops */
-void sbread(dev_t dev, struct superblock *sb);
+void sbread(dev_t, struct superblock *);
+void sbwrite(struct superblock *);
 
 #endif
